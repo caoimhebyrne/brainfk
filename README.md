@@ -8,8 +8,6 @@ A [brainfuck](https://brainfuck.org/) interpreter written in Go in a couple of h
 $ go run . <path-to-file>
 ```
 
-There are no command line arguments yet, I would like to add that soon, but I ran out of time for today.
-
 ### Implementation
 
 There are two main parts, the [lexer](./lexer.go) and the [instruction generator](./instruction.go).
