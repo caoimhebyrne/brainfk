@@ -73,9 +73,11 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 				c = lexer.Next()
 			}
 
-			// Next() will consume the character, so if it is not the one we want, we still
-			// need to handle it.
-			lexer.position -= 1
+			if c != 0 {
+				// Next() will consume the character, so if it is not the one we want, we still
+				// need to handle it.
+				lexer.position -= 1
+			}
 
 			instruction = Instruction{instructionType: InstructionIncrement, value: occurrences}
 		case '-':
@@ -85,9 +87,11 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 				c = lexer.Next()
 			}
 
-			// Next() will consume the character, so if it is not the one we want, we still
-			// need to handle it.
-			lexer.position -= 1
+			if c != 0 {
+				// Next() will consume the character, so if it is not the one we want, we still
+				// need to handle it.
+				lexer.position -= 1
+			}
 
 			instruction = Instruction{instructionType: InstructionDecrement, value: occurrences}
 		case '>':
@@ -97,9 +101,11 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 				c = lexer.Next()
 			}
 
-			// Next() will consume the character, so if it is not the one we want, we still
-			// need to handle it.
-			lexer.position -= 1
+			if c != 0 {
+				// Next() will consume the character, so if it is not the one we want, we still
+				// need to handle it.
+				lexer.position -= 1
+			}
 
 			instruction = Instruction{instructionType: InstructionAdd, value: occurrences}
 		case '<':
@@ -109,9 +115,11 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 				c = lexer.Next()
 			}
 
-			// Next() will consume the character, so if it is not the one we want, we still
-			// need to handle it.
-			lexer.position -= 1
+			if c != 0 {
+				// Next() will consume the character, so if it is not the one we want, we still
+				// need to handle it.
+				lexer.position -= 1
+			}
 
 			instruction = Instruction{instructionType: InstructionSubtract, value: occurrences}
 		case '.':
