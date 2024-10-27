@@ -3,27 +3,60 @@ package main
 type InstructionType int
 
 const (
-	Instruction_Inc = iota
-	Instruction_Dec
-	Instruction_Add
-	Instruction_Sub
-	Instruction_Output
-	Instruction_Input
-	Instruction_JumpIfZero
-	Instruction_JumpIfNonZero
+	// Increment the data pointer by 1.
+	InstructionIncrement = iota
+
+	// Decrement the data pointer by 1.
+	InstructionDecrement
+
+	// Increment the byte at the data pointer by 1.
+	InstructionAdd
+
+	// Decrement the byte at the data pointer by 1.
+	InstructionSubtract
+
+	// Output the byte at the data pointer.
+	InstructionOutput
+
+	// Accept one byte of input, storing its value in the byte at the data pointer.
+	InstructionInput
+
+	// If the byte at the data pointer is zero, jump to the command after the matching JumpIfNonZero.
+	InstructionJumpIfZero
+
+	// If the byte at the data pointer is non-zero, jump to the command after the matching JumpIfZero.
+	InstructionJumpIfNonZero
 )
 
+var instructionName = map[InstructionType]string{
+	InstructionIncrement:     "increment",
+	InstructionDecrement:     "decrement",
+	InstructionAdd:           "add",
+	InstructionSubtract:      "subtract",
+	InstructionOutput:        "output",
+	InstructionInput:         "input",
+	InstructionJumpIfZero:    "jump-if-zero",
+	InstructionJumpIfNonZero: "jump-if-non-zero",
+}
+
+// Returns a human-readable name for this instruction type.
+func (it InstructionType) String() string {
+	return instructionName[it]
+}
+
+// Represents a single parsed instruction.
 type Instruction struct {
 	// The type of instruction that this is.
 	instructionType InstructionType
 
 	// The associated value with this instruction.
-	// For all instructions except JumpX, this will be the occurrences.
-	// For JumpX instructions, this indicates the index of the instruction to jump to
-	// if the condition is true.
+	// - For Increment, Decrement, Add and Subtract instructions, this holds the amount to increment/decrement by.
+	// - For JumpX instructions, this holds the index of the instruction to jump to if the condition is true.
+	// - For all other instructions, this is unused.
 	value int
 }
 
+// Continuously reads from the provided lexer until all bytes have been read, returning a list of parsed instructions.
 func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 	instructions := []Instruction{}
 
@@ -44,7 +77,7 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 			// need to handle it.
 			lexer.position -= 1
 
-			instruction = Instruction{instructionType: Instruction_Inc, value: occurrences}
+			instruction = Instruction{instructionType: InstructionIncrement, value: occurrences}
 		case '-':
 			occurrences := 0
 			for c == '-' {
@@ -56,7 +89,7 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 			// need to handle it.
 			lexer.position -= 1
 
-			instruction = Instruction{instructionType: Instruction_Dec, value: occurrences}
+			instruction = Instruction{instructionType: InstructionDecrement, value: occurrences}
 		case '>':
 			occurrences := 0
 			for c == '>' {
@@ -68,7 +101,7 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 			// need to handle it.
 			lexer.position -= 1
 
-			instruction = Instruction{instructionType: Instruction_Add, value: occurrences}
+			instruction = Instruction{instructionType: InstructionAdd, value: occurrences}
 		case '<':
 			occurrences := 0
 			for c == '<' {
@@ -80,18 +113,18 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 			// need to handle it.
 			lexer.position -= 1
 
-			instruction = Instruction{instructionType: Instruction_Sub, value: occurrences}
+			instruction = Instruction{instructionType: InstructionSubtract, value: occurrences}
 		case '.':
-			instruction = Instruction{instructionType: Instruction_Output}
+			instruction = Instruction{instructionType: InstructionOutput}
 		case ',':
-			instruction = Instruction{instructionType: Instruction_Input}
+			instruction = Instruction{instructionType: InstructionInput}
 		case '[':
 			// This instruction tells the interpreter to jump to the character after its matching '[' if
 			// the byte at the current data pointer is zero.
 			// We will need to resolve that location once we have parsed all instructions.
-			instruction = Instruction{instructionType: Instruction_JumpIfZero}
+			instruction = Instruction{instructionType: InstructionJumpIfZero}
 		case ']':
-			instruction = Instruction{instructionType: Instruction_JumpIfNonZero}
+			instruction = Instruction{instructionType: InstructionJumpIfNonZero}
 		}
 
 		instructions = append(instructions, instruction)
@@ -100,7 +133,7 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 
 	// We have now collected all instructions, we must now resolve any jump locations.
 	for index, instruction := range instructions {
-		if instruction.instructionType == Instruction_JumpIfZero {
+		if instruction.instructionType == InstructionJumpIfZero {
 			position := index
 			depth := 1
 
@@ -112,19 +145,19 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 				position++
 				peek := instructions[position]
 
-				if peek.instructionType == Instruction_JumpIfZero {
+				if peek.instructionType == InstructionJumpIfZero {
 					depth++
-				} else if peek.instructionType == Instruction_JumpIfNonZero {
+				} else if peek.instructionType == InstructionJumpIfNonZero {
 					depth--
 				}
 			}
 
 			// We now have the position of the instruction that corresponds with this jump-if-zero.
-			instructions[index] = Instruction{instructionType: Instruction_JumpIfZero, value: position}
+			instructions[index] = Instruction{instructionType: InstructionJumpIfZero, value: position}
 			continue
 		}
 
-		if instruction.instructionType == Instruction_JumpIfNonZero {
+		if instruction.instructionType == InstructionJumpIfNonZero {
 			// We must find the closest if-zero instruction.
 			depth := 1
 			position := index - 1
@@ -136,14 +169,14 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 				peek := instructions[position]
 				position--
 
-				if peek.instructionType == Instruction_JumpIfNonZero {
+				if peek.instructionType == InstructionJumpIfNonZero {
 					depth++
-				} else if peek.instructionType == Instruction_JumpIfZero {
+				} else if peek.instructionType == InstructionJumpIfZero {
 					depth--
 				}
 			}
 
-			instructions[index] = Instruction{instructionType: Instruction_JumpIfNonZero, value: position}
+			instructions[index] = Instruction{instructionType: InstructionJumpIfNonZero, value: position}
 		}
 	}
 

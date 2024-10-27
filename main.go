@@ -45,13 +45,13 @@ func main() {
 		instruction := instructions[i]
 
 		switch instruction.instructionType {
-		case Instruction_Inc:
+		case InstructionIncrement:
 			context.cells[context.dataPointer] += byte(instruction.value)
 
-		case Instruction_Dec:
+		case InstructionDecrement:
 			context.cells[context.dataPointer] -= byte(instruction.value)
 
-		case Instruction_Add:
+		case InstructionAdd:
 			amount := uint16(instruction.value)
 			if context.dataPointer == (context.memorySize - amount) {
 				context.dataPointer = 0
@@ -59,7 +59,7 @@ func main() {
 				context.dataPointer += amount
 			}
 
-		case Instruction_Sub:
+		case InstructionSubtract:
 			amount := uint16(instruction.value)
 			if context.dataPointer == 0 {
 				context.dataPointer = context.memorySize - amount
@@ -67,19 +67,19 @@ func main() {
 				context.dataPointer -= amount
 			}
 
-		case Instruction_Output:
+		case InstructionOutput:
 			fmt.Printf("%c", context.cells[context.dataPointer])
 
-		case Instruction_Input:
+		case InstructionInput:
 			input, _ := reader.ReadByte()
 			context.cells[context.dataPointer] = input
 
-		case Instruction_JumpIfZero:
+		case InstructionJumpIfZero:
 			if context.cells[context.dataPointer] == 0 {
 				i = instruction.value
 			}
 
-		case Instruction_JumpIfNonZero:
+		case InstructionJumpIfNonZero:
 			if context.cells[context.dataPointer] != 0 {
 				i = instruction.value
 			}
