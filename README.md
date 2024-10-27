@@ -5,7 +5,7 @@ A [brainfuck](https://brainfuck.org/) interpreter written in Go in a couple of h
 ### Usage
 
 ```shell
-$ go run .
+$ go run . <path-to-file>
 ```
 
 There are no command line arguments yet, I would like to add that soon, but I ran out of time for today.

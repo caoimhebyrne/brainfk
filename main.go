@@ -17,9 +17,16 @@ func NewContext() *Context {
 }
 
 func main() {
-	lexer, err := NewLexer("./examples/bsort.b")
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: brainfk <file>")
+		os.Exit(-1)
+		return
+	}
+
+	fileName := os.Args[1]
+	lexer, err := NewLexer(fileName)
 	if err != nil {
-		fmt.Println("ERROR: Failed to create a lexer for `./examples/bsort.b`.")
+		fmt.Println("ERROR: Failed to create a lexer for `", fileName, "`.")
 		return
 	}
 
