@@ -41,10 +41,10 @@ Benchmark 1: ./brainfk
 
 Executing the compiled version of the brainfuck code:
 ```shell
-$ hyperfine -N ./build/output < ./examples/bsort.input
+$ hyperfine --warmup 100 -N ./build/output < ./examples/bsort.input
 Benchmark 1: ./build/output
-  Time (mean ± σ):     946.1 µs ± 150.0 µs    [User: 301.2 µs, System: 346.6 µs]
-  Range (min … max):   760.7 µs … 3682.7 µs    1654 runs
+  Time (mean ± σ):     938.5 µs ± 110.7 µs    [User: 302.9 µs, System: 344.8 µs]
+  Range (min … max):   798.7 µs … 3340.7 µs    3313 runs
 ```
 
 Compared with a [bsort implementation that I threw together in 3 minutes in Go](./examples/bsort.go):
