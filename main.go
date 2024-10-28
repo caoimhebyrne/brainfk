@@ -57,7 +57,7 @@ func main() {
 		return
 	}
 
-	result, err := exec.Command("/usr/bin/as", assemblyFile, "-o", binaryFile).CombinedOutput()
+	result, err := exec.Command("/usr/bin/cc", assemblyFile, "-o", binaryFile).CombinedOutput()
 	if err != nil {
 		fmt.Println("ERROR: Failed to compile assembly!")
 		fmt.Println(string(result[:]))
