@@ -2,7 +2,7 @@
 
 A [brainfuck](https://brainfuck.org/) ~~interpreter~~ interpreter _**AND**_ compiler* written in Go in a couple of hours because I wanted to learn Go.
 
-<small>*transpiles brainfuck to aarch64 assembly and compiles that into a binary.</small>
+<sub>*transpiles brainfuck to aarch64 assembly and compiles that into a binary.</sub>
 
 ### Usage
 
