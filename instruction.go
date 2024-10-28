@@ -184,7 +184,7 @@ func ParseInstructions(lexer *Lexer) ([]Instruction, error) {
 				}
 			}
 
-			instructions[index] = Instruction{instructionType: InstructionJumpIfNonZero, value: position}
+			instructions[index] = Instruction{instructionType: InstructionJumpIfNonZero, value: position + 1}
 		}
 	}
 
