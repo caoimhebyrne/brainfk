@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 )
 
 type Context struct {
@@ -23,10 +25,10 @@ func main() {
 		return
 	}
 
-	fileName := os.Args[1]
-	lexer, err := NewLexer(fileName)
+	path := os.Args[1]
+	lexer, err := NewLexer(path)
 	if err != nil {
-		fmt.Println("ERROR: Failed to create a lexer for `", fileName, "`.")
+		fmt.Println("ERROR: Failed to create a lexer for `", path, "`.")
 		return
 	}
 
@@ -38,26 +40,31 @@ func main() {
 		return
 	}
 
+	fmt.Println("INFO: Parsed", len(instructions), "instructions")
+
 	transpiler := NewTranspiler(instructions)
 	output := transpiler.Transpile()
 
-	err = os.WriteFile("./build/output.S", []byte(output), 0644)
+	outputDirectory := "./build/"
+
+	fileName := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	assemblyFile := outputDirectory + fileName + ".s"
+	binaryFile := outputDirectory + fileName
+
+	err = os.WriteFile(assemblyFile, []byte(output), 0644)
 	if err != nil {
 		fmt.Println("ERROR:", err)
 		return
 	}
 
-	result, err := exec.Command("/usr/bin/cc", "./build/output.S", "-o", "./build/output").Output()
+	result, err := exec.Command("/usr/bin/as", assemblyFile, "-o", binaryFile).CombinedOutput()
 	if err != nil {
-		fmt.Println("ERROR:", err)
+		fmt.Println("ERROR: Failed to compile assembly!")
+		fmt.Println(string(result[:]))
 		return
 	}
 
-	if len(result) != 0 {
-		fmt.Println("INFO:", string(result[:]))
-	}
-
-	fmt.Println("INFO: Compiled to ./build/output (./build/output.S)")
+	fmt.Println("INFO: Compiled to", binaryFile, "("+assemblyFile+")")
 
 	/*
 		context := NewContext()
